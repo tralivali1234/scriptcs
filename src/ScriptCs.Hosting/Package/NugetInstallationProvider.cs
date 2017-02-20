@@ -17,12 +17,6 @@ namespace ScriptCs.Hosting.Package
 
         private static readonly Version EmptyVersion = new Version();
 
-        [Obsolete("Support for Common.Logging types was deprecated in version 0.15.0 and will soon be removed.")]
-        public NugetInstallationProvider(IFileSystem fileSystem, Common.Logging.ILog logger)
-            : this(fileSystem, new CommonLoggingLogProvider(logger))
-        {
-        }
-
         public NugetInstallationProvider(IFileSystem fileSystem, ILogProvider logProvider)
         {
             Guard.AgainstNullArgument("fileSystem", fileSystem);
@@ -37,7 +31,7 @@ namespace ScriptCs.Hosting.Package
             var path = Path.Combine(_fileSystem.CurrentDirectory, _fileSystem.PackagesFolder);
             _repositoryUrls = GetRepositorySources(path);
             var remoteRepository = new AggregateRepository(PackageRepositoryFactory.Default, _repositoryUrls, true);
-            _manager = new PackageManager(remoteRepository, path);
+            _manager = new ScriptCsPackageManager(remoteRepository, path);
         }
 
         public IEnumerable<string> GetRepositorySources(string path)
@@ -77,9 +71,10 @@ namespace ScriptCs.Hosting.Package
         public void InstallPackage(IPackageReference packageId, bool allowPreRelease = false)
         {
             Guard.AgainstNullArgument("packageId", packageId);
-
+            
             var version = GetVersion(packageId);
             var packageName = packageId.PackageId + " " + (version == null ? string.Empty : packageId.Version.ToString());
+
             _manager.InstallPackage(packageId.PackageId, version, allowPrereleaseVersions: allowPreRelease, ignoreDependencies: false);
             _logger.Info("Installed: " + packageName);
         }

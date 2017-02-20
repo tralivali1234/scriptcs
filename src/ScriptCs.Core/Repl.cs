@@ -15,32 +15,6 @@ namespace ScriptCs
         private readonly Printers _printers;
         private readonly ILog _log;
 
-        [Obsolete("Support for Common.Logging types was deprecated in version 0.15.0 and will soon be removed.")]
-        public Repl(
-            string[] scriptArgs,
-            IFileSystem fileSystem,
-            IScriptEngine scriptEngine,
-            IObjectSerializer serializer,
-            Common.Logging.ILog logger,
-            IScriptLibraryComposer composer,
-            IConsole console,
-            IFilePreProcessor filePreProcessor,
-            IEnumerable<IReplCommand> replCommands,
-            Printers printers)
-            : this(
-                scriptArgs,
-                fileSystem,
-                scriptEngine,
-                serializer,
-                new CommonLoggingLogProvider(logger),
-                composer,
-                console,
-                filePreProcessor,
-                replCommands,
-                printers)
-        {
-        }
-
         public Repl(
             string[] scriptArgs,
             IFileSystem fileSystem,
@@ -51,8 +25,9 @@ namespace ScriptCs
             IConsole console,
             IFilePreProcessor filePreProcessor,
             IEnumerable<IReplCommand> replCommands,
-            Printers printers)
-            : base(fileSystem, filePreProcessor, scriptEngine, logProvider, composer)
+            Printers printers,
+            IScriptInfo scriptInfo)
+            : base(fileSystem, filePreProcessor, scriptEngine, logProvider, composer, scriptInfo)
         {
             Guard.AgainstNullArgument("serializer", serializer);
             Guard.AgainstNullArgument("logProvider", logProvider);
